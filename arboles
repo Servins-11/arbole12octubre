@@ -1,0 +1,93 @@
+class Nodo:
+    def __init__(self, valor):
+        self.valor = valor
+        self.izq = None
+        self.der = None
+        self.altura = 1
+
+
+def altura(n):
+    if n is None:
+        return 0
+    return n.altura
+
+
+def FE(n):
+    return altura(n.der) - altura(n.izq)
+
+
+def actualizar(n):
+    ai = altura(n.izq)
+    ad = altura(n.der)
+
+    if ai > ad:
+        n.altura = ai + 1
+    else:
+        n.altura = ad + 1
+
+
+def derecha(a):
+    b = a.izq
+    a.izq = b.der
+    b.der = a
+    actualizar(a)
+    actualizar(b)
+    return b
+
+
+def izquierda(a):
+    b = a.der
+    a.der = b.izq
+    b.izq = a
+    actualizar(a)
+    actualizar(b)
+    return b
+
+
+def insertar(n, valor):
+    if n is None:
+        return Nodo(valor)
+
+    if valor < n.valor:
+        n.izq = insertar(n.izq, valor)
+    elif valor > n.valor:
+        n.der = insertar(n.der, valor)
+    else:
+        return n
+
+    actualizar(n)
+    fe = FE(n)
+
+    if fe < -1 and valor < n.izq.valor:
+        return derecha(n)       # LL
+
+    if fe > 1 and valor > n.der.valor:
+        return izquierda(n)     # RR
+
+    if fe < -1 and valor > n.izq.valor:
+        n.izq = izquierda(n.izq)
+        return derecha(n)       # LR
+
+    if fe > 1 and valor < n.der.valor:
+        n.der = derecha(n.der)
+        return izquierda(n)     # RL
+
+    return n
+
+
+def mostrar(n):
+    if n is None:
+        return
+
+    mostrar(n.izq)
+    print(n.valor, "Altura:", n.altura, "FE:", FE(n))
+    mostrar(n.der)
+
+
+numeros = [10, 20, 30, 40, 50, 25]
+raiz = None
+
+for numero in numeros:
+    raiz = insertar(raiz, numero)
+
+mostrar(raiz)
